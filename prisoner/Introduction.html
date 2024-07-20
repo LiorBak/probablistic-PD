@@ -1,0 +1,108 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}General Instructions{{ endblock }}
+
+{{ block content }}
+
+<style>
+    .p1  {color: blue; font-weight:bold;}
+    .p2  {color: orange; font-weight:bold;}  
+    .p1.col {margin-right: 20px;}
+    .p2.col {margin-right: -20px;}
+</style>
+<!-- 
+.row {display: flex;}
+    .col {flex: 50%;}
+-->
+
+<p>
+    In this study, you will play five games. Each game consists of 10 rounds. In each game, you will be randomly and anonymously paired with another participant in this experiment. You will remain paired with the same participant for all 10 rounds of the game, and will then switch to play the next game with a different participant. You will not be paired with the same participant in more than one game.
+</p> 
+
+<h2>
+    Actions and Points
+</h2>
+<p>
+    In each round, both you and the other player (the person you will be paired with) will have to make a choice between two options. <span class="p1">You</span> will choose between playing <b>UP</b> or <b>DOWN</b> while the <span class="p2">other player</span> will choose between playing LEFT or RIGHT. You will make your choices simultaneously and privately. Your choices will jointly determine both your payoffs in points. These payoffs are detailed in the following table, with your payoffs marked in <span class="p1">blue</span> and the other player’s payoffs marked in <span class="p2">orange</span>:   
+</p>
+
+<!-- payoffs table -->
+<div class="form-group required">
+    <table class="table table-bordered text-center" style="width: auto; margin: auto">
+        <tr class="p2">
+            <th colspan="2" rowspan="2"></th>
+            <th colspan="2">Other player</th>
+        </tr>
+        <tr class="p2">
+            <th>LEFT</th>
+            <th>RIGHT</th>
+        </tr>
+        <tr>
+            <th rowspan="2" class="p1"><span>You</span></th>
+            <td><button name="intro_butt" class="btn btn-primary btn-large" disabled>UP</button> <br>(After the introduction, you will be able to press this button)</td>
+            <td><div class="p1 col">{{ t_left.CC}}</div> <br><div class="p2 col">{{t_right.CC}}</div></td>
+            <td><div class="p1 col">{{ t_left.CD }}</div> <br> <div class="p2 col">{{t_right.CD}}</div></td>
+        </tr>
+        <tr>
+            <td><button name="intro_butt" class="btn btn-primary btn-large" disabled>DOWN</button> <br>(After the introduction, you will be able to press this button)</td>
+            <td><div class="p1 col">{{t_left.DC}}</div> <br> <div class="p2 col">{{ t_right.DC }}</div></td>
+            <td><div class="p1 col">{{t_left.DD}}</div> <br> <div class="p2 col">{{t_right.DD}}</div></td>
+        </tr>
+    </table>
+</div>
+
+<p>
+    This shows:
+    <ul>
+        <li>If you choose UP and the other player chooses LEFT, <span class="p1">you</span> will gain <span class="p1">20</span> points.<br>The <span class="p2">other player</span> will also gain <span class="p2">20</span> points.</li><br>
+        <li> If you choose UP and the other player chooses RIGHT, <span class="p1">you</span> will <span class="p1">{{ desc_player.CD }}</span>.<br>The <span class="p2">other player</span> will <span class="p2">{{ desc_other.CD }}</span>.</li><br> 
+        <li> If you choose DOWN and the other player chooses LEFT, <span class="p1">you</span> will <span class="p1">{{ desc_player.DC }}</span>.<br>The <span class="p2">other player</span> will <span class="p2">{{ desc_other.DC }}</span>.</li><br> 
+        <li> If you choose DOWN and the other player chooses RIGHT, <span class="p1">you</span> will gain <span class="p1">10</span> points. The <span class="p2">other player</span> will also gain <span class="p2">10</span> points.</li>
+    </ul>
+
+<!--
+        <li> If you choose UP and the other player chooses LEFT, <span class="p1">you</span> will gain <span class="p1">20</span> points.<br>The <span class="p2">other player</span> will also gain <span class="p2">20</span> points.</li>
+        <li> If you choose UP and the other player chooses RIGHT, <span class="p1">you</span> will gain <span class="p1">30 points with probability 0.9 (90% chance), and lose 270 points otherwise (10% chance)</span>.<br>The <span class="p2">other player</span> will get <span class="p2">0 points with probability 0.9 (90% chance), and gain 300 points otherwise (10% chance)</span>.</li> 
+        <li> If you choose DOWN and the other player chooses LEFT, <span class="p1">you</span> will get <span class="p1">0 points with probability 0.9 (90% chance), and gain 300 points otherwise (10% chance)</span>.<br>The <span class="p2">other player</span> will gain <span class="p2">30 points with probability 0.9 (90% chance) and lose 270 points otherwise (10% chance)</span>.</li> 
+        <li> If you choose DOWN and the other player chooses RIGHT, <span class="p1">you</span> will gain <span class="p1">10</span> points. The <span class="p2">other player</span> will also gain <span class="p2">10</span> points.</li>
+-->
+    <br>The payoff table shown above will be displayed on the screen for the entire duration of the game.
+</p>
+
+<h2>
+    Decision Time and Feedback
+</h2>
+<p>
+    In each round, you will have 15 seconds to make your choice. To make a choice, you will need to press a button inside the table, either the ‘choose UP’ or ‘choose DOWN’ button.<br>
+If you don't make a choice in time, the computer will choose one for you at random, and 5 points will be deducted from your payoff for that round.
+</p>
+<p>
+    Note that in this experiment, you will only be able to proceed to the next round after another participant will proceed to the next round in their game.<br>
+After both you and your opponent make your choices, you will see your payoff for that round. Additionally, you will see the payoff that you would have gotten had you chosen otherwise. Lastly, you will see the choice your opponent made and the payoff they received.
+</p>
+<p>
+    In each round, the history of  choices and payoffs of both you and your opponent will be presented to you, so you can review them before making a new choice.
+</p>
+<h2>
+    Pairs
+</h2>
+<p>
+    After 10 rounds are over, you will get a new partner to play the same game with. Overall, you will be matched with 5 different partners, playing 10 rounds with each (a total of 50 rounds of the game).
+</p>
+
+<!-- payment info -->
+<h2>
+    Payment Info
+</h2>
+<p>
+    Your final payment for participating in the experiment will consist of a fixed payoff for your time (a "show-up fee") and a bonus you might receive based on your cumulative score in the game.
+</p>
+<div>
+    The show-up fee is 5 GBP.<br>
+The bonus payment will be an <b>additional 5 GBP</b>. Your chances to earn this bonus depends on the number of points you accumulate throughout the games. <b>The more points you accumulate, the higher your chances of getting the bonus</b>.<br>Specifically, we will add 1200 points to the total number of points you accumulate and then divide the sum by 4,000. The result will represent your chance (in percentages) to win the bonus.<br>For example, if you accumulate 800 points, you will have a (1200+800)/4000 =  50% chance to win the bonus.<br>This process means that to increase your chances of getting the bonus, you should <b>try to accumulate as many points as possible.</b>
+
+</div>
+
+
+{{ next_button }}
+
+{{ endblock }}

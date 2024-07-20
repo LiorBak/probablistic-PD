@@ -1,0 +1,39 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}Read Me{{ endblock }}
+
+{{ block content }}
+
+<h2>
+    ToDo
+</h2>
+
+#UX inhencements:
+#instructions: paired 10 rounds + how payment will work + ask players not to close experiment window
+#Before new supergame start: screen
+#end screen: thanks + payment function
+#update instructions in the introduction according to the desicion page. 
+#++ look at Peters shared file.
+
+#handle drpoputs (wait for next supergame + special screen 'your opponent dropped')
+V #timer + random choice & penalty
+
+<h2>
+    Handle Dropouts
+</h2>
+1) When a player closes his window he will never be marked as a droupout, because time limitations will not apply to him. To solve this, get to his link and manualy progress him. You can see his participant 'is_dropout' value = true
+
+<h2>
+    Run the game
+</h2>
+1) Change the constunt C.IS_TEST to False
+1.2) fix timeout functions in Desicion and Results (rmove first line)
+1.3) fix introduction is.displayed (=if player.round_number == 1)
+2) number of rounds - control via C.ROUNDS_PER_SUPERGAME. set to 50
+3) number of players - change 2 things: (a) number of players in the session config (b) group_matrices function in the Subsession module. Youll have to change this one manualy, and write a matrix of pairs that suits the number of players. 
+4) grouping - read 3) (b) above.
+5) game type - set player.game_type to one of the following: PD, CG, pCG, pPD.
+
+
+
+
+{{ endblock }}

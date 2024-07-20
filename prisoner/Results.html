@@ -1,0 +1,36 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}Results{{ endblock }}
+
+{{ block content }}
+
+<style>
+    .p1  {color: blue; font-weight:bold;}
+    .p2  {color: orange; font-weight:bold;}
+    .otree-timer {display: none;}
+</style>
+
+<h3>
+    Results for Round {{player.super_game_round_number}} of 10 with Player {{player.opponent_number}}
+</h3>
+<p>
+{{ if player.penalty == 0 }}
+    You chose <b><span class="p1">{{ if player.cooperate }}UP{{ else }}DOWN{{endif}}</span></b> and the other player chose <span class="p2">{{ if opponent_decision }}LEFT{{ else }}RIGHT{{endif}}</span>, hence:<br>
+    You <b><span class="p1">{{ payoff_text }}</span></b>.<br> 
+    Had you chosen to play differently (i.e, {{ if not player.cooperate }}UP{{ else }}DOWN{{endif}}) you would have <b>{{ forgone_text }}</b><br>
+    The other player {{ opponent_payoff }}.
+{{ else }}
+  <b>You recieved a penalty of {{player.penalty}}, because you didn't take action in time</b>. <br>
+    The system autamaticaly assigned you to play <b><span class="p1">{{ if player.cooperate }}UP{{ else }}DOWN{{endif}}</span></b>.<br>
+    The other player chose <span class="p2">{{ if opponent_decision }}LEFT{{ else }}RIGHT{{endif}}</span>. <br>
+    As a result, you <b><span class="p1">{{ payoff_text }}</span></b> (after penalty deduction).<br>
+    If the system would have chosen differently, you would have <b>{{ forgone_text }}</b>.<br>
+    The other player {{ opponent_payoff }}.
+{{ endif }}
+</p>
+
+
+{{ next_button }}
+
+{{ include C.INSTRUCTIONS_TEMPLATE }}
+
+{{ endblock }}
