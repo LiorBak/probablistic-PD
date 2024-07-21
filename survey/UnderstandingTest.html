@@ -1,0 +1,67 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}Understanding test{{ endblock }}
+
+{{ block content }}
+
+{{ block styles }}
+<style>
+    .do-not-show {
+        display: none;
+    }
+    .correct {
+        background-color: LightGreen;
+    }
+    .wrong {
+        background-color: Red;
+    }
+</style>
+{{ endblock }}
+
+    <div id="q1-form">
+        {{ formfields }}
+    </div>
+
+    <span id="q1-feedback" class="do-not-show">
+        The content here changes according to the subject's selection
+    </span>
+
+{{ next_button }}
+
+
+{{ endblock }}
+
+{{ block scripts }}
+<script>
+let q1_feedback = document.getElementById("q1-feedback");
+let q1 = document.getElementById("id_in_right_p2");
+let q1_form = document.getElementById("q1-form");
+let is_pass = document.getElementById("id_is_pass_test")
+
+//hide form to disable participant from moving to next screen
+is_pass.classList.add("do-not-show");
+
+q1.addEventListener("change", function() {
+    if (q1.value == 5) {
+      	q1.readOnly = true;
+      	q1.classList.remove("wrong");
+      	q1.classList.add("correct");  
+      	q1_feedback.innerHTML = "Correct! Press Next";
+      	is_pass.value = '1';
+        //is_pass.required = false;
+    } else {
+      	q1_feedback.innerHTML = "The above answers marked in red are incorrect";
+     	q1.classList.add("wrong");
+    }
+});
+
+/*
+Add inputs manually (so u won't have to put each one as Player property)
+You can add count for num of wrongs answers as player property instead of is_pass type
+
+var input = document.createElement("input");
+input.type = "text";
+input.className = "css-class-name"; // set the CSS class
+container.appendChild(input); // put it into the DOM
+*/
+</script>
+{{ endblock }}

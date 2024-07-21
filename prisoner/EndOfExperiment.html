@@ -1,0 +1,92 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}End of Experiment{{ endblock }}
+
+{{ block content }}
+
+<style>
+    .do-not-show {
+        display: none;
+    }
+    .button {
+      text-align: center;
+      text-decoration: none;
+      background-color: white;
+      color: blue;
+      background-color: white;
+      padding: 2px 6px 3px 6px;
+      border: 2px solid Blue; 
+      border-radius: 4px;
+      transition-duration: 0.4s;
+    }
+
+    .button:hover {
+      background-color: Blue; /*#89CFF0 Baby Blue */
+      color: white;
+    }
+    
+    .button.clicked {
+      background-color: blue;
+      color: white;
+      pointer-events: none;
+      cursor: default;
+    }
+</style>
+
+Congratulations!<br>
+<p>
+    You have finished the experiment!
+</p>
+<p>
+    Thank you for your participation.<br>You will receive {{C.SHOW_UP_FEE}}£ for your participation.</p>
+<p>
+    Your total score is {{player.total_score}}. Therefore, you have a {{bonus_chance}}% chance to win a bonus of 5£.
+</p>
+<p>
+    Press the button below to try and win the bonus.<br>A random number between 0 and 1 will appear. If your score-based number (that is, {{bonus_prob}}) will be bigger than the lottery number, you will earn the bonus!    
+</p>
+
+<a href="#" id="lottery" class="button" onclick="changeLabel()">
+    Click me to try for Bonus!
+</a>
+
+<div id="FinalPayoffInfo">
+    <p>
+        {{ if player.win_bonus }}
+          Congratulations! You earned the lottery ticket! It entitles you to an extra {{C.BONUS_FEE}}£. <br>
+          Your score-based number, {{bonus_prob}}, is bigger than the lottery number, {{lottery_num}}.
+        {{ else }}
+          Unfortunately, you did not win the lottery bonus.<br>
+          Your score-based number, {{bonus_prob}}, is smaller than the lottery number, {{lottery_num}}.
+        {{ endif }}
+    </p>
+    <p>
+    <b>Hence, your total payoff is {{player.total_experiment_payoffGDP}}£.</b>
+    </p>
+    To complete the experiment and qualify for the payoff, please answer a few brief questions on the next page.
+    {{ next_button }}
+</div>
+
+
+
+{{ endblock }}
+
+{{ block scripts }}
+<script>
+const finalInfo = document.getElementById('FinalPayoffInfo');
+// const is_pass = document.getElementById("id_is_pass") 
+// const nextBut = document.querySelector(".otree-btn-next btn btn-primary")
+
+// is_pass.classList.add("do-not-show"); //this form field will stay hidden, though required. Thus it disable participant from moving to next screen until we set it with some value
+finalInfo.classList.add("do-not-show");
+
+function changeLabel() {
+    const button = document.querySelector('.button');
+    button.innerHTML = '{{lottery_num}}';
+  	button.readOnly = true;
+  	button.classList.add("clicked")
+  	finalInfo.classList.remove("do-not-show")
+    // nextBut.onclick = function() { is_pass.value = '1'; }; // Assuming 'Next' button is only displayed when we want player to move next page.
+}
+
+</script>
+{{ endblock }}

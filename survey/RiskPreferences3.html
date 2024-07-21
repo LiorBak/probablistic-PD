@@ -1,0 +1,24 @@
+{{ extends 'global/Page.html' }}
+{{ block title }}Decision 3 of 3{{ endblock }}
+
+{{ block content }}
+
+Great!<br>
+Lastly, please choose between:<br>
+
+E: 
+{{ if player.is_risk_first }}
+  <button name="c7_or_30at09_otherwise_minus270" value="False" class="btn btn-primary btn-large">7 points with certainty</button>
+{{ else }}
+  <button name="c7_or_30at09_otherwise_minus270" value="True" class="btn btn-primary btn-large"><nobr>30 points with probability 90%</nobr>, and -270 otherwise</button>
+{{ endif }}
+<br>or
+<br>F: 
+{{ if not player.is_risk_first }}
+  <button name="c7_or_30at09_otherwise_minus270" value="False" class="btn btn-primary btn-large">7 points with certainty</button>
+{{ else }}
+  <button name="c7_or_30at09_otherwise_minus270" value="True" class="btn btn-primary btn-large"><nobr>30 points with probability 90%</nobr>, and -270 otherwise</button>
+{{ endif }}
+
+
+{{ endblock }}
