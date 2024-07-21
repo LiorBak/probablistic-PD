@@ -465,7 +465,6 @@ class EndOfSuperGame(Page):
         history = []
         super_game_start = player.round_number + 1 - player.super_game_round_number
         for round_number in range(super_game_start, player.round_number + 1):
-                player.test = round_number
                 past_player = player.in_round(round_number)
                 history.append(past_player)
         
