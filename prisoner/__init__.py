@@ -88,6 +88,8 @@ class Player(BasePlayer):
     win_bonus = models.BooleanField()
     total_experiment_payoffGDP = models.FloatField()
     is_pass = models.IntegerField(label='   ')
+    experiment_start_time = models.FloatField()
+    experiment_end_time = models.FloatField()
 def other_player(player: Player):
     group = player.group
     return player.get_others_in_group()[0]
@@ -220,6 +222,9 @@ class Introduction(Page):
         return player.round_number == 1
     @staticmethod
     def vars_for_template(player: Player):
+        import time
+        player.experiment_start_time = time.time()
+        
         # << copied from Desicion >>
         
         payoff_matrix = {}        
@@ -403,7 +408,7 @@ class Decision(Page):
             player.penalty = 0
     @staticmethod
     def get_timeout_seconds(player: Player):
-        if (player.round_number <= 3):
+        if ((player.round_number - 1) % C.ROUNDS_PER_SUPERGAME <= 2):
             return 2*C.DESICION_TIMEOUT
         else:
              return C.DESICION_TIMEOUT
@@ -441,17 +446,16 @@ class Results(Page):
         
         return dict(
             opponent=opponent,
-            my_decision=player.field_display('cooperate'),
-            opponent_decision=opponent.field_display('cooperate'),
+            opponent_decision = player.opponent_cooperate,
             payoff_text = value_to_text(player.payoff),
-            forgone_text = value_to_text(player.forgone_payoff),
+            forgone_text = str(player.forgone_payoff),
             opponent_payoff = value_to_text(opponent.payoff),
             opponent_penalty = opponent.penalty,
         )
     @staticmethod
     def get_timeout_seconds(player: Player):
-        if (player.round_number <= 3):
-            return 2*C.DESICION_TIMEOUT
+        if ((player.round_number - 1) % C.ROUNDS_PER_SUPERGAME <= 2):
+            return (4/3)*C.DESICION_TIMEOUT
         else:
              return (2/3)*C.DESICION_TIMEOUT
 class EndOfSuperGame(Page):
@@ -468,12 +472,15 @@ class EndOfSuperGame(Page):
                 past_player = player.in_round(round_number)
                 history.append(past_player)
         
+        game_num = round(player.round_number/C.ROUNDS_PER_SUPERGAME)
+        
         return dict(
             history = history,
+            game_num = game_num,
         )
     @staticmethod
     def get_timeout_seconds(player: Player):
-        return C.DESICION_TIMEOUT
+        return (4/3)*C.DESICION_TIMEOUT
 class EndOfExperiment(Page):
     form_model = 'player'
     @staticmethod
@@ -481,7 +488,11 @@ class EndOfExperiment(Page):
         return player.round_number == C.NUM_ROUNDS
     @staticmethod
     def vars_for_template(player: Player):
+        import time
+        player.experiment_end_time = time.time()
+        player.experiment_start_time = player.in_round(1).experiment_start_time
         chance_to_win, random_number = calc_total_payoff(player)
+        
         return dict(
             bonus_chance = chance_to_win*100,
             bonus_prob = chance_to_win,

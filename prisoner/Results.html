@@ -16,7 +16,7 @@
 {{ if player.penalty == 0 }}
     You chose <b><span class="p1">{{ if player.cooperate }}UP{{ else }}DOWN{{endif}}</span></b> and the other player chose <span class="p2">{{ if opponent_decision }}LEFT{{ else }}RIGHT{{endif}}</span>, hence:<br>
     You <b><span class="p1">{{ payoff_text }}</span></b>.<br> 
-    Had you chosen to play differently (i.e, {{ if not player.cooperate }}UP{{ else }}DOWN{{endif}}) you would have <b>{{ forgone_text }}</b><br>
+    Had you chosen to play differently (i.e, {{ if not player.cooperate }}UP{{ else }}DOWN{{endif}}) you would have gotten <b>{{ forgone_text }}</b><br>
     The other player {{ opponent_payoff }}.
 {{ else }}
   <b>You recieved a penalty of {{player.penalty}}, because you didn't take action in time</b>. <br>
@@ -27,9 +27,7 @@
     The other player {{ opponent_payoff }}.
 {{ endif }}
 </p>
-<p>
-    Your new total score is {{player.total_score}}.
-</p>
+
 
 {{ next_button }}
 

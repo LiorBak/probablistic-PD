@@ -1,5 +1,5 @@
 {{ extends 'global/Page.html' }}
-{{ block title }}End of Super Game{{ endblock }}
+{{ block title }}End of Game {{game_num}}{{ endblock }}
 
 {{ block content }}
 
@@ -8,7 +8,7 @@
     .p1  {color: blue; font-weight:bold;}
 </style>
 
-Congratulations! you completed a super game with player {{player.opponent_number}}. <br>
+Congratulations! you completed game number {{ game_num }} with player {{player.opponent_number}}. <br>
 {{ if player.round_number < C.NUM_ROUNDS }} You will now be matched with a <b>another player</b>. <br> {{ endif }}
 
 
