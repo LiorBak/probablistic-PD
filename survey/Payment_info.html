@@ -3,12 +3,26 @@
 
 {{ block content }}
 
+<p>Thank you for taking part in our study today. As noted at the start of the experiment, you will be paid {{session.config.participation_fee}} for your participation.</p>
+
+<p>There was also the possibility of earning a bonus of another {{session.config.bonus_payment}}£.</p>
+
+<p>You scored {{participant.total_score}} which means you had a {{participant.chance_to_win}}% chance of receiving the bonus payment.</p>
+
+<p>Your lottery number was {{participant.random_lottery_number}}.</p>
+{{ if participant.win_bonus }}
+  Hence, you earned the lottery ticket! It entitles you to the extra {{session.config.bonus_payment}}£. <br>
+{{ else }}
+  Unfortunately, you did not win the lottery bonus because your score-based number, {{participant.chance_to_win}}, was smaller than the lottery number. 
+{{ endif }}
+
+<p>Therefore your total payment for today is <strong>{{participant.payoff_plus_participation_fee}}.</strong></p>
+
 <p>
-    Please fill the following fields to anable your payment.
+    <b>Please use the following link to fill out the payment details:</b>
 </p>
-
-{{ formfields }}
-
-{{ next_button }}
+<p>
+    <a href="{{fwd_url}}">Payment Link</a>
+</p>
 
 {{ endblock }}

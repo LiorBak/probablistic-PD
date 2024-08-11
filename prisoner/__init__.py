@@ -1,12 +1,13 @@
 
 from otree.api import *
 c = cu
+import random
 
 doc = '\nThis is a one-shot "Prisoner\'s Dilemma". Two players are asked separately\nwhether they want to cooperate or defect. Their choices directly determine the\npayoffs.\n'
 class C(BaseConstants):
     NAME_IN_URL = 'prisoner'
     PLAYERS_PER_GROUP = 2
-    NUM_ROUNDS = 20
+    NUM_ROUNDS = 50
     ROUNDS_PER_SUPERGAME = 10
     PAYOFF_DC = cu(30)
     PAYOFF_CC = cu(20)
@@ -18,7 +19,7 @@ class C(BaseConstants):
     PAYOFF_CD_HIGH = cu(30)
     PAYOFF_CD_LOW = cu(-270)
     PAYOFF_CD_PROB_HIGH = 0.9
-    IS_TEST = True
+    IS_TEST = False
     DESICION_TIMEOUT = 15
     PENALTY = cu(5)
     SHOW_UP_FEE = 5
@@ -26,9 +27,7 @@ class C(BaseConstants):
     INSTRUCTIONS_TEMPLATE = 'prisoner/instructions.html'
 class Subsession(BaseSubsession):
     pass
-def creating_session(subsession: Subsession):
-    session = subsession.session
-    
+def creating_session(subsession: Subsession):    
     if subsession.round_number == 1:
         for p in subsession.get_players():
             participant = p.participant
@@ -50,10 +49,18 @@ def creating_session(subsession: Subsession):
         [[1, 6], [2, 3], [4, 5]],
     ]
     
+    if subsession.round_number == 1:
+        for i in range(1, C.NUM_ROUNDS + 1):
+            super_game_number = math.floor((i-1) / C.ROUNDS_PER_SUPERGAME)
+            subsession.in_round(i).set_group_matrix(group_matrices[super_game_number])
+            print('SP#',super_game_number, i, ":", group_matrices[super_game_number])
+    
+    """
     for s in subsession.in_rounds(1, C.NUM_ROUNDS):
         super_game_number = math.floor((s.round_number-1) / C.ROUNDS_PER_SUPERGAME)
         s.set_group_matrix(group_matrices[super_game_number])
-    
+        print('SP#',super_game_number, s, ":", group_matrices[super_game_number])
+    """
 def group_by_arrival_time_method(subsession: Subsession, waiting_players):
     print('in group by arrival time method')
     for player in waiting_players:
@@ -73,7 +80,7 @@ def set_payoffs(group: Group):
 class Player(BasePlayer):
     cooperate = models.BooleanField(choices=[[True, 'Cooperate'], [False, 'Defect']], doc='This player s decision', widget=widgets.RadioSelect)
     opponent_id_in_session = models.StringField(initial='')
-    game_type = models.StringField(initial='pPD')
+    game_type = models.StringField(initial='')
     forgone_payoff = models.CurrencyField()
     opponent_cooperate = models.BooleanField()
     opponent_payoff = models.CurrencyField()
@@ -96,8 +103,6 @@ def other_player(player: Player):
 def set_payoff(player: Player):
     if player.field_maybe_none('cooperate') is None:
         return  # for the last 3 rounds of risk preferences survey
-    
-    import random
     
     other = other_player(player)
     if player.game_type == "PD":
@@ -150,9 +155,6 @@ def set_payoff(player: Player):
     
     player.total_score = player.total_score + player.payoff  # total score is set to previous round when entering desicion page (func 'falues for new round')
 def waiting_too_long(player: Player):
-    session = player.session
-    subsession = player.subsession
-    group = player.group
     participant = player.participant
     if player.round_number < 4:
         return False  # because first 3 rounds have longer waiting time
@@ -193,12 +195,9 @@ def set_desicion_time(player: Player):
     else:
         player.decision_time = now - player.decision_time
 def is_player_dropout(player: Player):
-    participant = player.participant
     if player.decision_time >= C.DESICION_TIMEOUT + 3:  # in case user closed browers the timeout didn't work - so this is how we find he dropped
         player.participant.vars['is_dropout'] = True
-def calc_total_payoff(player: Player):
-    import random
-    
+def calc_total_payoff(player: Player):    
     chance_to_win = (float(player.total_score) + 1200)/4000
     player.chance_to_win_bonus = chance_to_win
     random_number = random.uniform(0, 1)
@@ -207,16 +206,24 @@ def calc_total_payoff(player: Player):
     if player.win_bonus:
         bonus = C.BONUS_FEE
     player.total_experiment_payoffGDP = C.SHOW_UP_FEE + bonus
-    
+
+    # populate payoff values to participant level
+    player.participant.vars['payoff'] = bonus
+    player.participant.vars['bonus'] = bonus  # this will be used later to overwrite payoff
+    player.participant.vars['total_score'] = float(player.total_score)
+    player.participant.vars['chance_to_win'] = chance_to_win*100
+    player.participant.vars['random_lottery_number'] = random_number*100
+    player.participant.vars['win_bonus'] = player.win_bonus
+
     return [chance_to_win, random_number]
+
+
 class InformedConsentPage(Page):
     form_model = 'player'
-    form_fields = ['Email']
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
 class Introduction(Page):
-    form_model = 'player'
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
@@ -224,6 +231,7 @@ class Introduction(Page):
     def vars_for_template(player: Player):
         import time
         player.experiment_start_time = time.time()
+        player.game_type = player.session.config['game_type'] 
         
         # << copied from Desicion >>
         
@@ -294,6 +302,12 @@ class Introduction(Page):
                     tj = 'C' if j == 1 else 'D'
                     text_left[f"{ti}{tj}"] = f'{payoff_matrix[(i,j)]}'
                     text_right[f"{tj}{ti}"] = f'{payoff_matrix[(j,i)]}'
+
+
+                    # _______<< only for introduction >>__________
+                    text_desc_player[f"{ti}{tj}"] = f'{value_to_text(payoff_matrix[(i,j)])} '  #player
+                    text_desc_other[f"{ti}{tj}"] = f'{value_to_text(payoff_matrix[(j,i)])} '  #opponent
+                    # _______<< end of 'only for introduction' >>______
         
         # << end of copy from Desicion >>
         
@@ -306,9 +320,7 @@ class Introduction(Page):
 class Decision(Page):
     form_model = 'player'
     form_fields = ['cooperate']
-    @staticmethod
-    def is_displayed(player: Player):
-        return True
+
     @staticmethod
     def vars_for_template(player: Player):
         values_for_new_round(player)
@@ -319,8 +331,8 @@ class Decision(Page):
         history = []
         super_game_start = player.round_number + 1 - player.super_game_round_number
         for round_number in range(super_game_start, player.round_number):
-                past_player = player.in_round(round_number)
-                history.append(past_player)
+            past_player = player.in_round(round_number)
+            history.append(past_player)
         
         # << start copy to introduction >>
         # ---- Define payoff_matrix -------
@@ -394,10 +406,8 @@ class Decision(Page):
         )
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
-        participant = player.participant
         set_desicion_time(player) # second run as the page ends
         
-        import random
         #  participant.wait_page_arrival = time.time()
         
         if timeout_happened:
@@ -416,10 +426,9 @@ class ResultsWaitPage(WaitPage):
     after_all_players_arrive = set_payoffs
     @staticmethod
     def is_displayed(player: Player):
-        participant = player.participant
-            # In case his opponent dropped:
-            # you should be able to open the respective participant’s URL and click on the “Next” button.
-            # Or just forward him with 'other_participant.is_dropout = True' then it will skip waitpages
+        # In case his opponent dropped:
+        # you should be able to open the respective participant’s URL and click on the “Next” button.
+        # Or just forward him with 'other_participant.is_dropout = True' then it will skip waitpages
         other_participant = other_player(player).participant
         
         if other_participant.is_dropout:
@@ -427,14 +436,8 @@ class ResultsWaitPage(WaitPage):
         else:
             return True
 class Results(Page):
-    form_model = 'player'
-    @staticmethod
-    def is_displayed(player: Player):
-        return True
     @staticmethod
     def vars_for_template(player: Player):
-        session = player.session
-        participant = player.participant
         opponent = other_player(player)
         player.opponent_id_in_session = str(opponent.participant.id_in_session)
         player.opponent_cooperate = opponent.cooperate
@@ -457,9 +460,8 @@ class Results(Page):
         if ((player.round_number - 1) % C.ROUNDS_PER_SUPERGAME <= 2):
             return (4/3)*C.DESICION_TIMEOUT
         else:
-             return (2/3)*C.DESICION_TIMEOUT
+            return (2/3)*C.DESICION_TIMEOUT
 class EndOfSuperGame(Page):
-    form_model = 'player'
     @staticmethod
     def is_displayed(player: Player):
         return player.super_game_round_number == C.ROUNDS_PER_SUPERGAME
@@ -480,9 +482,8 @@ class EndOfSuperGame(Page):
         )
     @staticmethod
     def get_timeout_seconds(player: Player):
-        return (4/3)*C.DESICION_TIMEOUT
+        return (5/3)*C.DESICION_TIMEOUT
 class EndOfExperiment(Page):
-    form_model = 'player'
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == C.NUM_ROUNDS
@@ -499,8 +500,5 @@ class EndOfExperiment(Page):
             lottery_num = random_number,
         )
 class ReadMe(Page):
-    form_model = 'player'
-    @staticmethod
-    def is_displayed(player: Player):
-        return False
-page_sequence = [InformedConsentPage, Introduction, Decision, ResultsWaitPage, Results, EndOfSuperGame, EndOfExperiment, ReadMe]
+    pass
+page_sequence = [InformedConsentPage, Introduction, Decision, ResultsWaitPage, Results, EndOfSuperGame, EndOfExperiment]
