@@ -50,10 +50,12 @@ def creating_session(subsession: Subsession):
     ]
     
     if subsession.round_number == 1:
+        print( subsession.get_players()[0].session.config['game_type'], 'session started.', C.NUM_ROUNDS, 'rounds')
         for i in range(1, C.NUM_ROUNDS + 1):
             super_game_number = math.floor((i-1) / C.ROUNDS_PER_SUPERGAME)
             subsession.in_round(i).set_group_matrix(group_matrices[super_game_number])
-            print('SP#',super_game_number, i, ":", group_matrices[super_game_number])
+            # print('SP#',super_game_number, i, ":", group_matrices[super_game_number])
+            
     
     """
     for s in subsession.in_rounds(1, C.NUM_ROUNDS):
@@ -301,7 +303,7 @@ class Introduction(Page):
                     ti = 'C' if i == 1 else 'D'
                     tj = 'C' if j == 1 else 'D'
                     text_left[f"{ti}{tj}"] = f'{payoff_matrix[(i,j)]}'
-                    text_right[f"{tj}{ti}"] = f'{payoff_matrix[(j,i)]}'
+                    text_right[f"{ti}{tj}"] = f'{payoff_matrix[(j,i)]}'
 
 
                     # _______<< only for introduction >>__________
@@ -394,7 +396,7 @@ class Decision(Page):
                     ti = 'C' if i == 1 else 'D'
                     tj = 'C' if j == 1 else 'D'
                     text_left[f"{ti}{tj}"] = f'{payoff_matrix[(i,j)]}'
-                    text_right[f"{tj}{ti}"] = f'{payoff_matrix[(j,i)]}'
+                    text_right[f"{ti}{tj}"] = f'{payoff_matrix[(j,i)]}'
         
         # << end copy to introduction >>
         # ------------------
