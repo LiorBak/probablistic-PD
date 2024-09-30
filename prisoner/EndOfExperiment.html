@@ -37,7 +37,7 @@ Congratulations!<br>
     You have finished the experiment!
 </p>
 <p>
-    Thank you for your participation.<br>You will receive {{C.SHOW_UP_FEE}}£ for your participation.</p>
+    Thank you for your participation.<br>You will receive {{show_up_fee}}£ for your participation.</p>
 <p>
     Your total score is {{player.total_score}}. Therefore, you have a {{bonus_chance}}% chance to win a bonus of 5£.
 </p>
@@ -52,7 +52,7 @@ Congratulations!<br>
 <div id="FinalPayoffInfo">
     <p>
         {{ if player.win_bonus }}
-          Congratulations! You earned the lottery ticket! It entitles you to an extra {{C.BONUS_FEE}}£. <br>
+          Congratulations! You earned the lottery ticket! It entitles you to an extra {{bonus_fee}}£. <br>
           Your score-based number, {{bonus_prob}}, is bigger than the lottery number, {{lottery_num}}.
         {{ else }}
           Unfortunately, you did not win the lottery bonus.<br>

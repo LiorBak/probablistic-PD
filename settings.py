@@ -1,7 +1,7 @@
 from os import environ
 SESSION_CONFIG_DEFAULTS = dict(real_world_currency_per_point=1, 
-                               participation_fee=5,
-                               bonus_payment=5,
+                               participation_fee=4,
+                               bonus_payment=4,
                                turned_away_fee=3)
 
 SESSION_CONFIGS = [
@@ -9,7 +9,7 @@ SESSION_CONFIGS = [
          num_demo_participants=6,
          app_sequence=['prisoner', 'survey'],
          use_browser_bots=False,
-         game_type="pPD",
+         game_type="PD",
          ),
     dict(
         name='forwrd_link',

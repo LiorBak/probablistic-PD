@@ -22,12 +22,13 @@ class C(BaseConstants):
     IS_TEST = False
     DESICION_TIMEOUT = 15
     PENALTY = cu(5)
-    SHOW_UP_FEE = 5
-    BONUS_FEE = 5
+    # SHOW_UP_FEE = 5
+    # BONUS_FEE = 5
     INSTRUCTIONS_TEMPLATE = 'prisoner/instructions.html'
 class Subsession(BaseSubsession):
     pass
-def creating_session(subsession: Subsession):    
+def creating_session(subsession: Subsession):
+
     if subsession.round_number == 1:
         for p in subsession.get_players():
             participant = p.participant
@@ -206,12 +207,13 @@ def calc_total_payoff(player: Player):
     player.win_bonus = chance_to_win > random_number
     bonus = 0
     if player.win_bonus:
-        bonus = C.BONUS_FEE
-    player.total_experiment_payoffGDP = C.SHOW_UP_FEE + bonus
+        bonus = player.session.config['bonus_payment']
+    total_payoff = player.session.config['participation_fee'] + bonus
+    player.total_experiment_payoffGDP = float(total_payoff)
 
     # populate payoff values to participant level
-    player.participant.vars['payoff'] = bonus
-    player.participant.vars['bonus'] = bonus  # this will be used later to overwrite payoff
+    player.participant.vars['payoff'] = float(bonus)
+    player.participant.vars['bonus'] = float(bonus)  # this will be used later to overwrite payoff
     player.participant.vars['total_score'] = float(player.total_score)
     player.participant.vars['chance_to_win'] = chance_to_win*100
     player.participant.vars['random_lottery_number'] = random_number*100
@@ -225,6 +227,12 @@ class InformedConsentPage(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(
+            show_up_fee = int(player.session.config['participation_fee']),
+            bonus_fee = player.session.config['bonus_payment'],
+        )
 class Introduction(Page):
     @staticmethod
     def is_displayed(player: Player):
@@ -233,7 +241,7 @@ class Introduction(Page):
     def vars_for_template(player: Player):
         import time
         player.experiment_start_time = time.time()
-        player.game_type = player.session.config['game_type'] 
+        player.game_type = player.session.config['game_type']
         
         # << copied from Desicion >>
         
@@ -318,6 +326,8 @@ class Introduction(Page):
             t_right = text_right,
             desc_player = text_desc_player,
             desc_other = text_desc_other,
+            show_up_fee = int(player.session.config['participation_fee']),
+            bonus_fee = player.session.config['bonus_payment'],
         )
 class Decision(Page):
     form_model = 'player'
@@ -500,6 +510,8 @@ class EndOfExperiment(Page):
             bonus_chance = chance_to_win*100,
             bonus_prob = chance_to_win,
             lottery_num = random_number,
+            show_up_fee = int(player.session.config['participation_fee']),
+            bonus_fee = player.session.config['bonus_payment'],
         )
 class ReadMe(Page):
     pass
